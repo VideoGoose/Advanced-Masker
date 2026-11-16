@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Advanced Masker v@VERSION@">
+<title>Advanced Masker output v@VERSION@</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; width: 100%; height: 100%; cursor: none; }
+  body.alpha { background: transparent; }
+  canvas { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+/*@MASK@*/
+</script>
+<script>
+/*
+ * Output page for a Designer Web layer. The whole mask set comes from the part of its own URL
+ * after '#':   out.html#name=<layer>&d=<encoded mask set>
+ * The plugin rewrites that URL as you edit; a hash-only change doesn't reload the page, it fires
+ * 'hashchange' and redraws in place. The matte is drawn at the mask set's own pixel size and
+ * stretched to the layer.
+ */
+(function () {
+  'use strict';
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var doc = AMask.defaults(), pending = false;
+
+  function parse() {
+    var p = new URLSearchParams(location.hash.replace(/^#/, ''));
+    doc = (p.get('d') && AMask.decode(p.get('d'))) || AMask.defaults();
+  }
+  function draw() {
+    pending = false;
+    if (canvas.width !== doc.w) canvas.width = doc.w;
+    if (canvas.height !== doc.h) canvas.height = doc.h;
+    document.body.classList.toggle('alpha', !!doc.style);
+    AMask.render(ctx, doc, doc.w, doc.h);
+  }
+  function schedule() { if (!pending) { pending = true; requestAnimationFrame(draw); } }
+  window.addEventListener('hashchange', function () { parse(); schedule(); });
+  parse(); schedule();
+})();
+</script>
+</body>
+</html>

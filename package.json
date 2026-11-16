@@ -1,0 +1,13 @@
+{
+  "name": "advanced-masker",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "python build.py",
+    "test": "python tests/run_tests.py"
+  },
+  "devDependencies": {
+    "playwright": "1.48.2"
+  }
+}
